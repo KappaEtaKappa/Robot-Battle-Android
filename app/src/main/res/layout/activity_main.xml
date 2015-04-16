@@ -55,7 +55,8 @@
         android:inputType="text"
         android:text="Data sending Area"
         android:textColor="#999999"
-        android:textSize="20dip" />
+        android:textSize="20dip"
+        android:padding="5dp"/>
 
     <Button
         android:id="@+id/buttonScan"

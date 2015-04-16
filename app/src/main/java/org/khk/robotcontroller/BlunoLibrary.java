@@ -1,9 +1,8 @@
-package com.example.blunobasicdemo;
+package org.khk.robotcontroller;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.blunobasicdemo.R;
 
 import android.os.Handler;
 import android.os.IBinder;
@@ -157,6 +156,8 @@ public abstract  class BlunoLibrary  extends Activity{
 			        	mConnectionState=connectionStateEnum.isConnecting;
 			        	onConectionStateChange(mConnectionState);
 			            mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
+
+                        mScanDeviceDialog.dismiss();
 
                         Intent openController = new Intent(mainContext, ControllerActivity.class);
 

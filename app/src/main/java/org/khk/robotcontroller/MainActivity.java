@@ -1,4 +1,4 @@
-package com.example.blunobasicdemo;
+package org.khk.robotcontroller;
 
 import android.os.Bundle;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 
 public class MainActivity  extends BlunoLibrary {
 	private Button buttonScan;

@@ -1,21 +1,17 @@
-package com.example.blunobasicdemo.views;
+package org.khk.robotcontroller.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
 
-
-import com.example.blunobasicdemo.ControllerActivity;
-import com.example.blunobasicdemo.MotherFuckingGlobals;
+import org.khk.robotcontroller.ControllerActivity;
+import org.khk.robotcontroller.MotherFuckingGlobals;
 
 import java.util.Calendar;
 
@@ -38,9 +34,10 @@ public class ControllerView extends View{
     private void init(Context context){
         this.context = context;
         this.brush = new Paint();
-        this.vKnob = new V_Throttle();
-        this.hKnob = new H_Throttle();
+        this.vKnob = new V_Throttle(this);
+        this.hKnob = new H_Throttle(this);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -98,6 +95,7 @@ public class ControllerView extends View{
 
     public void fire(){
         MotherFuckingGlobals.fucker.serialSend("z");
+        Log.d("Control Key", "z");
     }
 
     private class H_Throttle{
@@ -106,12 +104,18 @@ public class ControllerView extends View{
         public int padding;
         public float trackWidth;
         private int touchID;
+        public ControllerView parent;
+        private final long WAIT_DURATION = 100L;
 
-        public H_Throttle(){
+        private Long lastSend;
+
+        public H_Throttle(ControllerView parent){
             this.brush = new Paint();
             this.knubPosition = 0.5f;
             this.padding = 10;
             this.touchID = -1;
+            this.parent = parent;
+            lastSend = Calendar.getInstance().getTimeInMillis();
         }
 
         public void draw(Canvas canvas){
@@ -140,6 +144,16 @@ public class ControllerView extends View{
             float realXonTrack = (x - (getWidth()/2+padding));
             knubPosition = realXonTrack/trackWidth;
 
+            char out;
+            double numba = (knubPosition*20);
+            out = (char) ('A' + (char)numba);
+
+            if(Calendar.getInstance().getTimeInMillis() - lastSend > WAIT_DURATION) {
+                lastSend = Calendar.getInstance().getTimeInMillis();
+                MotherFuckingGlobals.fucker.serialSend(""+out);
+                Log.d("Control Key", ""+out);
+            }
+
         }
 
         public void trackTouch(MotionEvent ev) {
@@ -163,6 +177,15 @@ public class ControllerView extends View{
                     if( ev.getPointerId(index) == touchID ){
                         touchID = -1;
                         this.knubPosition = 0.5f;
+
+                        MotherFuckingGlobals.fucker.serialSend("K");
+                        MotherFuckingGlobals.fucker.serialSend("K");
+                        MotherFuckingGlobals.fucker.serialSend("K");
+                        MotherFuckingGlobals.fucker.serialSend("K");
+                        MotherFuckingGlobals.fucker.serialSend("K");
+                        MotherFuckingGlobals.fucker.serialSend("K");
+                        Log.d("Control Key", "K");
+
                     }
                     break;
             }
@@ -175,12 +198,18 @@ public class ControllerView extends View{
         public int padding;
         private float trackWidth;
         private int touchID;
+        private Thread myRunner;
+        public ControllerView parent;
 
-        public V_Throttle(){
+        public V_Throttle(ControllerView parent){
             this.brush = new Paint();
             this.knubPosition = 0.5f;
             this.padding = 10;
             touchID = -1;
+            this.parent = parent;
+
+            myRunner = new Thread(new V_runner(this));
+            myRunner.start();
         }
 
         public void draw(Canvas canvas){
@@ -207,7 +236,6 @@ public class ControllerView extends View{
 
             float realYonTrack = (y - (padding));
             knubPosition = realYonTrack/trackWidth;
-            int i = 0;
         }
 
         public void trackTouch(MotionEvent ev) {
@@ -236,5 +264,44 @@ public class ControllerView extends View{
             }
         }
 
+
+    }
+
+    public class V_runner implements Runnable{
+        private V_Throttle throttle;
+        private final long WAIT_DURATION = 100L;
+
+        private Long lastSend;
+
+        public V_runner(V_Throttle that){
+            this.throttle = that;
+            lastSend = Calendar.getInstance().getTimeInMillis();
+        }
+
+        @Override
+        public void run() {
+            while(true) {
+                if (Calendar.getInstance().getTimeInMillis() - lastSend > WAIT_DURATION) {
+                    if(throttle.knubPosition == 0.5f && throttle.parent.hKnob.knubPosition == 0.5f){
+
+                        lastSend = Calendar.getInstance().getTimeInMillis();
+                        MotherFuckingGlobals.fucker.serialSend("k");
+                        Log.d("Control Key", "k");
+                    }else{
+                        if(throttle.knubPosition != 0.5f) {
+                            char out;
+                            double numba = (throttle.knubPosition * 20);
+                            out = (char) ('a' + (char) numba);
+
+                            lastSend = Calendar.getInstance().getTimeInMillis();
+                            MotherFuckingGlobals.fucker.serialSend("" + out);
+                            Log.d("Control Key", "" + out);
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
+

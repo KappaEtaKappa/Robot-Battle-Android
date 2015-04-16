@@ -1,4 +1,6 @@
-package com.example.blunobasicdemo;
+package org.khk.robotcontroller;
+
+import org.khk.robotcontroller.BlunoLibrary;
 
 /**
  * Created by joedailey on 4/15/15.
